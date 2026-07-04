@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Six Months to Save Your Skeleton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#120D18; --panel:#191320; --panel2:#221831; --line:#33263F;
+    --rose:#FF5C77; --teal:#2CC5A6; --amber:#F4C97A;
+    --text:#F3EEF7; --muted:#A99FB6; --white:#FCFAFE;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 70% -10%, rgba(255,92,119,.10), transparent 60%),
+      radial-gradient(1000px 500px at 10% 110%, rgba(44,197,166,.10), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:Georgia,'Times New Roman',serif;
+    line-height:1.6;
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px 16px;
+  }
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .stage{width:100%; max-width:600px; background:var(--panel); border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  .top{padding:26px 28px 0;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--teal); margin:0 0 12px;}
+  h1{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:700; font-size:clamp(1.7rem,5.5vw,2.4rem); line-height:1.05; letter-spacing:-.01em; margin:0 0 14px; color:var(--white);}
+  h1 .hl{color:var(--rose);}
+  .sub{color:var(--muted); font-size:1.02rem; margin:0 0 8px;}
+  .body{padding:22px 28px 28px;}
+
+  /* meters */
+  .meters{display:flex; gap:14px; padding:18px 28px 4px; border-bottom:1px solid var(--line); background:var(--panel2);}
+  .meter{flex:1;}
+  .meter__top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;}
+  .meter__label{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted);}
+  .meter__val{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;}
+  .bone .meter__val{color:var(--amber);} .muscle .meter__val{color:var(--rose);}
+  .track{height:9px; background:rgba(255,255,255,.08); border-radius:9px; overflow:hidden;}
+  .fill{height:100%; width:60%; border-radius:9px; transition:width .6s cubic-bezier(.2,.7,.2,1);}
+  .bone .fill{background:linear-gradient(90deg,#C9973F,var(--amber));}
+  .muscle .fill{background:linear-gradient(90deg,#C8324E,var(--rose));}
+
+  .progress{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin:0 0 12px;}
+  .scenario{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.28rem; line-height:1.25; color:var(--white); margin:0 0 8px;}
+  .prompt{color:var(--text); margin:0 0 20px; font-size:1.02rem;}
+
+  .choices{display:flex; flex-direction:column; gap:11px;}
+  button{font:inherit; cursor:pointer;}
+  .choice{
+    text-align:left; background:var(--panel2); color:var(--text);
+    border:1px solid var(--line); border-radius:12px; padding:15px 16px;
+    font-size:1rem; transition:border-color .15s, transform .12s, background .15s;
+  }
+  .choice:hover{border-color:var(--teal); transform:translateY(-1px);}
+  .choice:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+  .choice .ch__lead{font-family:'Space Grotesk',sans-serif; font-weight:600; color:var(--white); display:block; margin-bottom:2px;}
+  .choice[disabled]{opacity:.5; cursor:default; transform:none;}
+  .choice.picked{border-color:var(--rose);}
+
+  .feedback{margin-top:6px; border-left:3px solid var(--teal); background:rgba(44,197,166,.07); border-radius:0 10px 10px 0; padding:14px 16px; font-size:.98rem;}
+  .feedback .delta{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.04em; display:block; margin-top:8px; color:var(--muted);}
+  .delta .up{color:var(--teal);} .delta .down{color:var(--rose);}
+
+  .btn{
+    margin-top:20px; display:inline-block; width:100%;
+    background:var(--rose); color:#1A0E14; border:none; border-radius:12px;
+    padding:15px 18px; font-family:'Space Grotesk',sans-serif; font-weight:700;
+    font-size:1.05rem; letter-spacing:.01em; text-align:center;
+    transition:transform .12s, filter .15s;
+  }
+  .btn:hover{transform:translateY(-2px); filter:brightness(1.06);}
+  .btn:focus-visible{outline:2px solid var(--teal); outline-offset:3px;}
+  .btn.ghost{background:transparent; color:var(--teal); border:1px solid var(--line);}
+
+  .verdict{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.5rem,4.5vw,2rem); line-height:1.1; margin:4px 0 12px;}
+  .verdict.good{color:var(--teal);} .verdict.mid{color:var(--amber);} .verdict.bad{color:var(--rose);}
+  .final-meters{display:flex; gap:22px; margin:16px 0 4px;}
+  .fm{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--muted);}
+  .fm b{font-family:'Space Grotesk',sans-serif; font-size:22px; display:block;}
+  .fm.bone b{color:var(--amber);} .fm.muscle b{color:var(--rose);}
+  .foot{font-size:.82rem; color:var(--muted); margin-top:20px; text-align:center; padding-bottom:2px;}
+  .foot a{color:var(--teal);}
+
+  @media (prefers-reduced-motion: reduce){
+    .fill{transition:none;} .choice,.btn{transition:none;}
+  }
+  @media (max-width:420px){
+    .meters{padding-left:20px; padding-right:20px;} .top{padding-left:20px;padding-right:20px;} .body{padding-left:20px;padding-right:20px;}
+  }
+</style>
+</head>
+<body>
+<main class="stage" role="main">
+  <div id="meters" class="meters" style="display:none;">
+    <div class="meter bone">
+      <div class="meter__top"><span class="meter__label">Bone density</span><span class="meter__val" id="boneVal">60%</span></div>
+      <div class="track"><div class="fill" id="boneFill" style="width:60%"></div></div>
+    </div>
+    <div class="meter muscle">
+      <div class="meter__top"><span class="meter__label">Muscle mass</span><span class="meter__val" id="muscleVal">60%</span></div>
+      <div class="track"><div class="fill" id="muscleFill" style="width:60%"></div></div>
+    </div>
+  </div>
+
+  <div class="top">
+    <p class="eyebrow" id="eyebrow">Crew health sim &middot; EART4004</p>
+  </div>
+  <div class="body" id="screen"><!-- rendered by JS --></div>
+</main>
+
+<script>
+(function(){
+  var bone = 60, muscle = 60;
+  var round = 0;
+
+  var rounds = [
+    {
+      title: "Month 1 &mdash; your daily routine",
+      prompt: "You've got two hours a day carved out for exercise. How do you spend it?",
+      choices: [
+        { lead:"Heavy resistance: squats &amp; deadlifts on the ARED", db:9, dm:12,
+          fb:"The best call. Bone rebuilds in response to <em>force</em>, and nothing loads it like heavy squats and deadlifts &mdash; which also hammer the glutes and legs you're trying to save." },
+        { lead:"Just jog on the treadmill", db:-3, dm:-2,
+          fb:"Cardio keeps your heart and lungs happy, but running in microgravity barely loads your bones. They keep quietly demineralising." },
+        { lead:"Skip most of it &mdash; you're busy running experiments", db:-15, dm:-18,
+          fb:"Without loading, your body ditches muscle and bone it thinks it no longer needs. This is how you come home unable to walk." }
+      ]
+    },
+    {
+      title: "Month 2 &mdash; the menu",
+      prompt: "Space food is bland and your appetite is off. What's your nutrition plan?",
+      choices: [
+        { lead:"Hit energy, protein, calcium + a daily vitamin D pill", db:7, dm:9,
+          fb:"Spot on. You can't out-train a bad diet. And that vitamin D pill is non-negotiable: there's no sunlight through the hull, so your skin can't make its own to absorb calcium." },
+        { lead:"Eat well, but skip the vitamin D supplement", db:-11, dm:-1,
+          fb:"Sneaky trap. No sunlight means no vitamin D, which means you absorb less calcium &mdash; and your bones pay for it even if you're training hard." },
+        { lead:"Under-eat &mdash; nothing tastes good up here", db:-9, dm:-13,
+          fb:"Running a calorie deficit in orbit is a disaster: with no fuel to rebuild, your body strips muscle for energy on top of the microgravity losses." }
+      ]
+    },
+    {
+      title: "Month 3 &mdash; the mid-mission scan",
+      prompt: "A bone scan shows your resorption markers climbing &mdash; your body is breaking down bone faster than it builds it. The flight surgeon offers a bone-protecting drug.",
+      choices: [
+        { lead:"Add a bisphosphonate alongside the exercise", db:8, dm:1,
+          fb:"Smart backup. Bisphosphonates slow the cells that dissolve bone (osteoclasts). Paired with heavy exercise, this combo has helped astronauts return with almost no bone loss." },
+        { lead:"Decline &mdash; rely on training and food alone", db:0, dm:0,
+          fb:"A fair call if you've been lifting heavy. Exercise and nutrition are the foundation &mdash; but drugs are a genuine third weapon when the scans look ugly." }
+      ]
+    },
+    {
+      title: "Month 4 &mdash; motivation dips",
+      prompt: "You're tired, homesick, and two hours of daily exercise is grinding. Do you keep it up?",
+      choices: [
+        { lead:"Stick to the full session, every single day", db:6, dm:8,
+          fb:"This is the hard truth of spaceflight: the body never takes a day off from wasting away, so neither can you. Consistency is everything." },
+        { lead:"Trim workouts to 30 minutes for a while", db:-10, dm:-12,
+          fb:"Even a few slack weeks show up in the numbers. Deconditioning is relentless and quietly cumulative." }
+      ]
+    },
+    {
+      title: "Month 6 &mdash; preparing to come home",
+      prompt: "Landing is close. How do you spend your final weeks in orbit?",
+      choices: [
+        { lead:"Ramp up the heavy lifting", db:7, dm:7,
+          fb:"Backed by real data: astronauts who did more deadlifting recovered their shin-bone density better after landing. Finish strong." },
+        { lead:"Ease off to rest before re-entry", db:-7, dm:-6,
+          fb:"Tempting, but resting now just hands back gains right before the hardest test &mdash; standing up under gravity again." }
+      ]
+    }
+  ];
+
+  var screen = document.getElementById('screen');
+  var metersEl = document.getElementById('meters');
+
+  function clamp(v){ return Math.max(0, Math.min(100, v)); }
+
+  function paintMeters(){
+    document.getElementById('boneVal').textContent = Math.round(bone) + '%';
+    document.getElementById('muscleVal').textContent = Math.round(muscle) + '%';
+    document.getElementById('boneFill').style.width = clamp(bone) + '%';
+    document.getElementById('muscleFill').style.width = clamp(muscle) + '%';
+  }
+
+  function renderIntro(){
+    metersEl.style.display = 'none';
+    document.getElementById('eyebrow').innerHTML = 'Crew health sim &middot; EART4004';
+    screen.innerHTML =
+      '<h1>Six months to <span class="hl">save your skeleton</span></h1>' +
+      '<p class="sub">You\'ve just docked at the space station for a six-month mission. Adelaide\'s own Andy Thomas did this for real &mdash; about four and a half months aboard Mir.</p>' +
+      '<p class="sub">Every month, choose how you live. Land back on Earth with as much <b style="color:var(--amber)">bone</b> and <b style="color:var(--rose)">muscle</b> as you can.</p>' +
+      '<button class="btn" id="startBtn">Begin the mission &rarr;</button>';
+    document.getElementById('startBtn').addEventListener('click', function(){ round = 0; bone = 60; muscle = 60; renderRound(); });
+  }
+
+  function renderRound(){
+    metersEl.style.display = 'flex';
+    paintMeters();
+    var r = rounds[round];
+    document.getElementById('eyebrow').innerHTML = 'Mission log &middot; month ' + (round+1) + ' of ' + rounds.length;
+    var html = '<p class="progress">Decision ' + (round+1) + ' / ' + rounds.length + '</p>' +
+      '<p class="scenario">' + r.title + '</p>' +
+      '<p class="prompt">' + r.prompt + '</p>' +
+      '<div class="choices">';
+    r.choices.forEach(function(c, i){
+      html += '<button class="choice" data-i="' + i + '"><span class="ch__lead">' + c.lead + '</span></button>';
+    });
+    html += '</div><div id="fbSlot"></div>';
+    screen.innerHTML = html;
+    var btns = screen.querySelectorAll('.choice');
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){ pick(parseInt(b.getAttribute('data-i'),10), btns); });
+    });
+  }
+
+  function pick(i, btns){
+    var r = rounds[round];
+    var c = r.choices[i];
+    bone = clamp(bone + c.db);
+    muscle = clamp(muscle + c.dm);
+    paintMeters();
+    btns.forEach(function(b){ b.disabled = true; });
+    btns[i].classList.add('picked');
+
+    function sign(n){ if(n>0) return '<span class="up">&#9650; +'+n+'</span>'; if(n<0) return '<span class="down">&#9660; '+n+'</span>'; return '<span>&middot; 0</span>'; }
+    var fb = document.getElementById('fbSlot');
+    fb.innerHTML = '<div class="feedback">' + c.fb +
+      '<span class="delta">Bone ' + sign(c.db) + ' &nbsp;&nbsp; Muscle ' + sign(c.dm) + '</span></div>' +
+      '<button class="btn" id="nextBtn">' + (round < rounds.length-1 ? 'Next month &rarr;' : 'Return to Earth &rarr;') + '</button>';
+    document.getElementById('nextBtn').addEventListener('click', function(){
+      if(round < rounds.length-1){ round++; renderRound(); } else { renderEnd(); }
+    });
+    fb.querySelector('.feedback').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function renderEnd(){
+    var avg = (bone + muscle) / 2;
+    document.getElementById('eyebrow').innerHTML = 'Touchdown &middot; post-flight report';
+    var cls, verdict, text;
+    if(avg >= 80){
+      cls='good'; verdict='You walked away.';
+      text='You stride off the capsule under your own power &mdash; just like Andy Thomas, who walked to meet the scientists after months on Mir. Heavy resistance work and solid nutrition kept your losses small. This is the goal.';
+    } else if(avg >= 55){
+      cls='mid'; verdict='Wobbly, but upright.';
+      text='You can stand, but your balance and leg strength took a hit. You\'re facing weeks of supervised reconditioning to relearn the basics &mdash; completely normal for returning crew, but avoidable losses added up.';
+    } else {
+      cls='bad'; verdict='Stretchered off.';
+      text='Your weight-bearing bones aged the equivalent of a decade in six months, and your muscles wasted badly. The scary part: studies show this bone loss can still be there a year after landing &mdash; and might be partly permanent.';
+    }
+    screen.innerHTML =
+      '<p class="verdict ' + cls + '">' + verdict + '</p>' +
+      '<p class="prompt">' + text + '</p>' +
+      '<div class="final-meters">' +
+        '<div class="fm bone">Bone density<b>' + Math.round(bone) + '%</b></div>' +
+        '<div class="fm muscle">Muscle mass<b>' + Math.round(muscle) + '%</b></div>' +
+      '</div>' +
+      '<button class="btn" id="againBtn">Fly it again &#8635;</button>' +
+      '<p class="foot">Every choice here maps to a real countermeasure NASA &amp; ESA astronauts use. Read the full blog for the science.</p>';
+    document.getElementById('againBtn').addEventListener('click', renderIntro);
+  }
+
+  renderIntro();
+})();
+</script>
+</body>
+</html>
